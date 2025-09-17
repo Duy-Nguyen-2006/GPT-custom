@@ -1,10 +1,7 @@
 # Timetable Solver App
 
-Ứng dụng FastAPI + OR-Tools sinh thời khóa biểu.
+Ứng dụng FastAPI cho phép GPT gửi code solver và dữ liệu để sinh thời khóa biểu.
 
-## Cài đặt
-
+## Cách chạy local
 ```bash
-git clone <repo_url>
-cd <repo_name>
-pip install -r requirements.txt
+uvicorn main:app --reload
