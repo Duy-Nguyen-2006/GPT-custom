@@ -8,9 +8,9 @@ app = FastAPI()
 
 class RequestData(BaseModel):
     request_id: str | None = None
-    code: str                # đoạn code solver do GPT gửi
-    assignments: list[str]   # danh sách phân công
-    config: dict             # thông tin ngày/tiết, ràng buộc
+    code: str
+    assignments: list[str]
+    config: dict
 
 @app.post("/run")
 async def run_solver(data: RequestData):
@@ -23,10 +23,9 @@ async def run_solver(data: RequestData):
         tmp_path = tmp_file.name
 
     try:
-        # Chạy file solver vừa lưu
+        # Import code từ file tạm
         module_globals = runpy.run_path(tmp_path)
 
-        # Yêu cầu code solver phải có hàm solve_timetable
         if "solve_timetable" not in module_globals:
             return {
                 "request_id": request_id,
@@ -36,9 +35,13 @@ async def run_solver(data: RequestData):
 
         solve_func = module_globals["solve_timetable"]
 
-        # Gọi solver với dữ liệu
-        result = solve_func(data.dict())
+        # Chạy solver
+        result = solve_func({
+            "assignments": data.assignments,
+            "config": data.config
+        })
 
+        # Chỉ trả về kết quả dạng list chuỗi
         return {
             "request_id": request_id,
             "status": "ok",
