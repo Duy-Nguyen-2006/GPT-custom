@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Story to Video Automator",
+  "version": "1.0",
+  "description": "Automate story splitting and video generation on Google Labs FX using Gemini AI",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "https://labs.google/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://labs.google/fx/vi/tools/flow*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Story to Video Automator"
+  },
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}
