@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Story to Video Automator</h1>
+        
+        <div id="url-error" class="error-message" style="display: none;">
+            ❌ This extension only works on https://labs.google/fx/vi/tools/flow
+        </div>
+
+        <div id="main-form" style="display: none;">
+            <div class="form-group">
+                <label for="story">Story Script (Vietnamese or English):</label>
+                <textarea id="story" rows="6" placeholder="Enter your story here..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="api-key">Gemini API Key:</label>
+                <input type="password" id="api-key" placeholder="AIzaSy...">
+                <small>Your API key is not stored permanently</small>
+            </div>
+
+            <div class="form-group">
+                <label for="scene-count">Number of Scenes (1-10):</label>
+                <input type="number" id="scene-count" min="1" max="10" value="3">
+            </div>
+
+            <button id="generate-scenes" class="primary-btn">Create Scenes</button>
+        </div>
+
+        <div id="scenes-display" style="display: none;">
+            <h3>Generated Scenes:</h3>
+            <div id="scenes-list"></div>
+            <div class="button-group">
+                <button id="start-automation" class="primary-btn">Start Video Generation</button>
+                <button id="back-to-form" class="secondary-btn">Back to Edit</button>
+            </div>
+        </div>
+
+        <div id="progress" style="display: none;">
+            <h3>Processing...</h3>
+            <div class="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="progress-text">Initializing...</div>
+        </div>
+
+        <div id="completion" style="display: none;">
+            <h3>✅ All videos generated successfully!</h3>
+            <p>Check your downloads folder for the video files.</p>
+            <button id="close-extension" class="primary-btn">Close</button>
+        </div>
+
+        <div id="error" class="error-message" style="display: none;"></div>
+        <div id="loading" style="display: none;">Loading...</div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
