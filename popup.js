@@ -177,16 +177,41 @@ async function startAutomation() {
     // Switch to progress view
     document.getElementById('scenes-display').style.display = 'none';
     document.getElementById('progress').style.display = 'block';
+    updateProgress(0, currentScenes.length, 'Initializing automation...');
 
     try {
         const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-        const tabId = tabs[0].id;
+        
+        if (!tabs || tabs.length === 0) {
+            throw new Error('No active tab found. Please make sure you are on the Google Labs FX page.');
+        }
+        
+        const tab = tabs[0];
+        const tabId = tab.id;
+        
+        // Verify we're on the correct URL with proper validation
+        if (!tab.url) {
+            throw new Error('Cannot determine current page URL.');
+        }
+        
+        try {
+            const url = new URL(tab.url);
+            if (url.hostname !== 'labs.google' || !url.pathname.startsWith('/fx/vi/tools/flow')) {
+                throw new Error('Please navigate to https://labs.google/fx/vi/tools/flow before starting automation.');
+            }
+        } catch (urlError) {
+            throw new Error('Please navigate to https://labs.google/fx/vi/tools/flow before starting automation.');
+        }
+
+        updateProgress(0, currentScenes.length, 'Injecting automation script...');
 
         // Inject the automation script
         await chrome.scripting.executeScript({
             target: { tabId: tabId },
             files: ['content.js']
         });
+
+        updateProgress(0, currentScenes.length, 'Starting video generation process...');
 
         // Start the automation process
         await chrome.tabs.sendMessage(tabId, {
@@ -197,8 +222,23 @@ async function startAutomation() {
         // Listen for progress updates
         chrome.runtime.onMessage.addListener(handleAutomationMessage);
 
+        console.log(`Automation started successfully for ${currentScenes.length} scenes`);
+
     } catch (error) {
-        showError('Failed to start automation: ' + error.message);
+        console.error('Failed to start automation:', error);
+        
+        let errorMessage = 'Failed to start automation: ' + error.message;
+        
+        // Provide more specific error messages
+        if (error.message.includes('Cannot access')) {
+            errorMessage = 'Cannot access the page. Please make sure you are on https://labs.google/fx/vi/tools/flow and refresh the page.';
+        } else if (error.message.includes('No active tab')) {
+            errorMessage = 'No active tab found. Please make sure the Google Labs FX tab is active.';
+        } else if (error.message.includes('Receiving end does not exist')) {
+            errorMessage = 'Communication error. Please refresh the Google Labs FX page and try again.';
+        }
+        
+        showError(errorMessage);
         backToScenes();
     }
 }
@@ -219,9 +259,24 @@ function handleAutomationMessage(message, sender, sendResponse) {
 }
 
 function updateProgress(current, total, status) {
-    const percentage = (current / total) * 100;
-    document.getElementById('progress-fill').style.width = percentage + '%';
-    document.getElementById('progress-text').textContent = `Processing scene ${current}/${total}: ${status}`;
+    const percentage = Math.min(100, (current / total) * 100);
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    
+    if (progressFill) {
+        progressFill.style.width = percentage + '%';
+    }
+    
+    if (progressText) {
+        if (current === 0) {
+            progressText.textContent = status;
+        } else {
+            progressText.textContent = `Processing scene ${current}/${total}: ${status}`;
+        }
+    }
+    
+    // Log progress to console for debugging
+    console.log(`Progress: ${Math.round(percentage)}% - Scene ${current}/${total}: ${status}`);
 }
 
 function showCompletion() {
@@ -247,11 +302,32 @@ function closeExtension() {
 
 function showError(message) {
     const errorElement = document.getElementById('error');
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-    setTimeout(() => {
-        errorElement.style.display = 'none';
-    }, 5000);
+    
+    if (errorElement) {
+        // Clean up the error message for better display
+        let displayMessage = message;
+        
+        // Make URLs clickable if they appear in error messages (secure approach)
+        const labsUrl = 'https://labs.google/fx/vi/tools/flow';
+        if (displayMessage === `Please navigate to ${labsUrl} before starting automation.`) {
+            displayMessage = `Please navigate to <a href="${labsUrl}" target="_blank">${labsUrl}</a> before starting automation.`;
+        }
+        
+        errorElement.innerHTML = displayMessage;
+        errorElement.style.display = 'block';
+        
+        // Auto-hide after 10 seconds for longer error messages, 5 seconds for short ones
+        const hideDelay = displayMessage.length > 100 ? 10000 : 5000;
+        
+        setTimeout(() => {
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }, hideDelay);
+    }
+    
+    // Also log the error to console for debugging
+    console.error('Extension Error:', message);
 }
 
 function showLoading(message) {
