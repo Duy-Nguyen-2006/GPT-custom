@@ -1,6 +1,22 @@
 # Story to Video Automator - Chrome Extension
 
-A Chrome extension that automates the process of converting story scripts into multiple video scenes using Google Labs FX and Gemini AI.
+A Chrome extension that automates the process of converting story scripts into multiple video scenes using Google Labs FX and Gemini AI. **Now supports both manual text input and file upload functionality!**
+
+## New Features ✨
+
+### 📁 **File Upload Support**
+- **Multiple Input Methods**: Choose between manual text input or file upload
+- **File Format Support**: 
+  - Plain text files (.txt)
+  - CSV files (.csv) 
+  - Excel files (.xlsx, .xls) - save as CSV for best compatibility
+- **Automatic Content Extraction**: Intelligently extracts story content from uploaded files
+- **Real-time Preview**: See extracted content before processing
+
+### 🚀 **No External Dependencies**
+- **Self-contained**: No need for external batch files or open_chrome.bat
+- **Browser-based**: Works entirely within the Chrome extension interface
+- **Seamless Integration**: File upload integrates perfectly with existing Gemini AI workflow
 
 ## Features
 
@@ -47,17 +63,22 @@ A Chrome extension that automates the process of converting story scripts into m
    - Click the extension icon in your toolbar
    - The popup interface will appear
 
-3. **Enter Your Content**:
-   - **Story Script**: Enter your story in Vietnamese or English
+3. **Choose Input Method**:
+   - **Manual Text Input**: Enter your story directly in the text area
+   - **File Upload**: Upload a text file, CSV file, or Excel file containing your story
+   
+4. **Enter Your Content**:
+   - **For Manual Input**: Enter your story in Vietnamese or English in the text area
+   - **For File Upload**: Click "Choose File" and select your file (.txt, .csv, .xlsx, .xls)
    - **API Key**: Enter your Gemini API key (not stored permanently)
    - **Scene Count**: Choose 1-10 scenes (default: 3)
 
-4. **Generate Scenes**:
+5. **Generate Scenes**:
    - Click "Create Scenes"
-   - Wait for Gemini AI to process your story
+   - Wait for Gemini AI to process your story (from text input or uploaded file)
    - Review the generated English prompts for each scene
 
-5. **Start Automation**:
+6. **Start Automation**:
    - Click "Start Video Generation" 
    - The extension will automatically:
      - Enter each prompt into Google Labs FX
@@ -65,7 +86,7 @@ A Chrome extension that automates the process of converting story scripts into m
      - Wait for videos to complete
      - Download each video as `scene_1.mp4`, `scene_2.mp4`, etc.
 
-6. **Monitor Progress**:
+7. **Monitor Progress**:
    - Watch the progress bar and status updates
    - Videos will be saved to your default downloads folder
 

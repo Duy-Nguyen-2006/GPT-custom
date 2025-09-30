@@ -25,7 +25,9 @@
 4. **Usage**:
    - Go to https://labs.google/fx/vi/tools/flow
    - Click extension icon
-   - Enter story, API key, scene count (1-10)
+   - **Choose input method**: Manual text input OR file upload
+   - **For manual input**: Enter story, API key, scene count (1-10)
+   - **For file upload**: Upload .txt, .csv, or Excel file (save Excel as CSV for best compatibility)
    - Click "Create Scenes"
    - Review generated prompts
    - Click "Start Video Generation"
@@ -34,11 +36,13 @@
 ## Features
 
 ✅ **AI-Powered Scene Generation** - Uses Gemini to split stories into detailed video prompts  
+✅ **Multiple Input Methods** - Support for manual text input AND file upload (.txt, .csv, Excel)  
 ✅ **Automated Video Creation** - Handles entire Google Labs FX workflow  
+✅ **No External Dependencies** - Self-contained, no need for batch files  
 ✅ **Security Focused** - No permanent storage, URL restrictions  
 ✅ **Progress Tracking** - Real-time status updates  
 ✅ **Error Handling** - Comprehensive retry logic  
-✅ **User-Friendly Interface** - Clean, intuitive design
+✅ **User-Friendly Interface** - Clean, intuitive design with file preview
 
 ## Technical Specifications
 

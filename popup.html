@@ -14,8 +14,28 @@
 
         <div id="main-form" style="display: none;">
             <div class="form-group">
+                <label>Input Method:</label>
+                <div class="input-method-selector">
+                    <input type="radio" id="text-input" name="input-method" value="text" checked>
+                    <label for="text-input">Manual Text Input</label>
+                    <input type="radio" id="file-input" name="input-method" value="file">
+                    <label for="file-input">Excel File Upload</label>
+                </div>
+            </div>
+
+            <div id="text-input-section" class="form-group">
                 <label for="story">Story Script (Vietnamese or English):</label>
                 <textarea id="story" rows="6" placeholder="Enter your story here..."></textarea>
+            </div>
+
+            <div id="file-input-section" class="form-group" style="display: none;">
+                <label for="excel-file">Upload Text/CSV File:</label>
+                <input type="file" id="excel-file" accept=".txt,.csv,.xlsx,.xls" />
+                <small>Upload a text file, CSV file, or Excel file containing your story content. For Excel files, save as CSV first for best compatibility.</small>
+                <div id="file-preview" style="display: none;">
+                    <h4>File Content Preview:</h4>
+                    <div id="file-content"></div>
+                </div>
             </div>
 
             <div class="form-group">

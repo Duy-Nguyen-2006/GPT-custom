@@ -30,6 +30,14 @@ function setupEventListeners() {
     document.getElementById('back-to-form').addEventListener('click', backToForm);
     document.getElementById('close-extension').addEventListener('click', closeExtension);
     
+    // Input method toggle
+    document.querySelectorAll('input[name="input-method"]').forEach(radio => {
+        radio.addEventListener('change', toggleInputMethod);
+    });
+    
+    // Excel file upload
+    document.getElementById('excel-file').addEventListener('change', handleFileUpload);
+    
     // Input validation
     document.getElementById('scene-count').addEventListener('input', function(e) {
         const value = parseInt(e.target.value);
@@ -38,14 +46,139 @@ function setupEventListeners() {
     });
 }
 
+function toggleInputMethod() {
+    const inputMethod = document.querySelector('input[name="input-method"]:checked').value;
+    const textSection = document.getElementById('text-input-section');
+    const fileSection = document.getElementById('file-input-section');
+    
+    if (inputMethod === 'text') {
+        textSection.style.display = 'block';
+        fileSection.style.display = 'none';
+        // Clear file input and preview
+        document.getElementById('excel-file').value = '';
+        document.getElementById('file-preview').style.display = 'none';
+    } else {
+        textSection.style.display = 'none';
+        fileSection.style.display = 'block';
+        // Clear text input
+        document.getElementById('story').value = '';
+    }
+}
+
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        document.getElementById('file-preview').style.display = 'none';
+        return;
+    }
+
+    if (!file.name.match(/\.(txt|csv|xlsx|xls)$/i)) {
+        showError('Please select a valid text, CSV, or Excel file');
+        event.target.value = '';
+        return;
+    }
+
+    showLoading('Processing file...');
+    
+    try {
+        const content = await readFile(file);
+        displayFilePreview(content);
+        hideLoading();
+    } catch (error) {
+        hideLoading();
+        showError('Failed to read file: ' + error.message);
+        event.target.value = '';
+    }
+}
+
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const content = e.target.result;
+                let story = '';
+                
+                if (file.name.match(/\.(txt)$/i)) {
+                    // Plain text file
+                    story = content.trim();
+                } else if (file.name.match(/\.(csv)$/i)) {
+                    // CSV file - extract all text content
+                    const lines = content.split('\n');
+                    for (let line of lines) {
+                        const cells = line.split(',');
+                        for (let cell of cells) {
+                            // Remove quotes and trim
+                            const cleanCell = cell.replace(/^"(.*)"$/, '$1').trim();
+                            if (cleanCell) {
+                                story += cleanCell + ' ';
+                            }
+                        }
+                    }
+                } else if (file.name.match(/\.(xlsx|xls)$/i)) {
+                    // For Excel files, try to parse as text (user should save as CSV for best results)
+                    showError('For Excel files, please save as CSV first for best compatibility. You can also paste the content directly into the text area.');
+                    reject(new Error('Excel files require CSV conversion for parsing'));
+                    return;
+                }
+                
+                if (!story.trim()) {
+                    reject(new Error('No text content found in file'));
+                    return;
+                }
+                
+                resolve(story.trim());
+            } catch (error) {
+                reject(new Error('Invalid file format'));
+            }
+        };
+        
+        reader.onerror = function() {
+            reject(new Error('Failed to read file'));
+        };
+        
+        reader.readAsText(file);
+    });
+}
+
+function displayFilePreview(content) {
+    const preview = content.length > 500 ? content.substring(0, 500) + '...' : content;
+    document.getElementById('file-content').textContent = preview;
+    document.getElementById('file-preview').style.display = 'block';
+}
+
 async function generateScenes() {
-    const story = document.getElementById('story').value.trim();
+    const inputMethod = document.querySelector('input[name="input-method"]:checked').value;
+    let story = '';
+    
+    // Get story content based on input method
+    if (inputMethod === 'text') {
+        story = document.getElementById('story').value.trim();
+    } else {
+        // For file input, get content from Excel file
+        const fileInput = document.getElementById('excel-file');
+        if (!fileInput.files[0]) {
+            showError('Please select an Excel file');
+            return;
+        }
+        
+        // Re-read the file to get the story content
+        try {
+            story = await readFile(fileInput.files[0]);
+        } catch (error) {
+            showError('Failed to read file: ' + error.message);
+            return;
+        }
+    }
+    
     const apiKey = document.getElementById('api-key').value.trim();
     const sceneCount = parseInt(document.getElementById('scene-count').value);
 
     // Validation
     if (!story) {
-        showError('Please enter a story script');
+        const inputType = inputMethod === 'text' ? 'story script' : 'content from Excel file';
+        showError(`Please provide a ${inputType}`);
         return;
     }
     if (!apiKey) {
