@@ -172,6 +172,56 @@ small {
     padding: 20px 0;
 }
 
+.input-method-selector {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.input-method-selector input[type="radio"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+.input-method-selector label {
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: #fafafa;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #1a73e8;
+    background: #f0f7ff;
+}
+
+#file-preview {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#file-content {
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    color: #333;
+}
+
 #completion h3 {
     color: #137333;
     margin-bottom: 16px;
